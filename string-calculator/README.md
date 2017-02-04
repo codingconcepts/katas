@@ -1,6 +1,6 @@
 String Calculator
 
-1.  (/) Create a simple String calculator with a method int Add(string numbers)
+1.  Create a simple String calculator with a method int Add(string numbers)
   a.  The method can take 0, 1 or 2 numbers, and will return their sum (for an empty string it will return 0) for example “” or “1” or “1,2”
   b.  Start with the simplest test case of an empty string and move to 1 and two numbers
   c.  Remember to solve things as simply as possible so that you force yourself to write tests you did not think about
