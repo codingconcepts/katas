@@ -11,7 +11,11 @@ var (
 	missingNumberError = errors.New("Missing start or end number")
 
 	digitRegex    = regexp.MustCompile(`^\d$`)
-	surroundRegex = regexp.MustCompile(`^\d(?s).*\d$`)
+	surroundRegex = regexp.MustCompile(`^\d[\s\S]*\d$`)
+
+	// TODO: this regex doesn't allow new line characters to
+	// be used as delimiters at the moment
+	customDelimiterRegex = regexp.MustCompile(`//([\s\S]*)\n`)
 )
 
 type Adder interface {
@@ -22,7 +26,7 @@ type Calculator struct {
 	delimiters []rune
 }
 
-func NewCalculator(delimiters []rune) (calc *Calculator) {
+func NewCalculator(delimiters ...rune) (calc *Calculator) {
 	return &Calculator{
 		delimiters: delimiters,
 	}
@@ -34,6 +38,15 @@ func NewCalculator(delimiters []rune) (calc *Calculator) {
 // the start or end.
 func (calc *Calculator) Add(numbers string) (result int, err error) {
 	numbers = cleanInput(numbers)
+
+	// parse a customer delimiter if one has been provided,
+	// then strip it from the input.  doing this here and
+	// not in the Calculator setup because the custom
+	// delimiter is provided via the input to Add, not to
+	// the calculator itself
+	if calc.parseCustomDelimeter(numbers) {
+		numbers = calc.stripCustomerDelimiter(numbers)
+	}
 
 	if numbers == "" {
 		return 0, nil
@@ -82,7 +95,7 @@ func (calc *Calculator) getNumbers(numbers string) (output []int, err error) {
 			continue
 		}
 
-		// trim each
+		// trim each number
 		numStr = strings.Trim(numStr, " ")
 
 		var numInt int
@@ -118,4 +131,32 @@ func sum(numbers []int) (sum int) {
 	}
 
 	return
+}
+
+// parseCustomDelimeter allows the user to provide
+// a customer split delimiter between numbers.
+func (calc *Calculator) parseCustomDelimeter(numbers string) (ok bool) {
+	if !customDelimiterRegex.MatchString(numbers) {
+		return false
+	}
+
+	results := customDelimiterRegex.FindStringSubmatch(numbers)
+	if len(results) == 0 {
+		return
+	}
+
+	// replace the calculator's delimiters with the
+	// user's new one
+	calc.delimiters = []rune{
+		rune(results[1][0]),
+	}
+
+	return true
+}
+
+// stripCustomerDelimiter removes the user's custom
+// delimeter from the input, allowing the result of
+// it to be parsed.
+func (*Calculator) stripCustomerDelimiter(numbers string) (output string) {
+	return customDelimiterRegex.ReplaceAllString(numbers, "")
 }
