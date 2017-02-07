@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -231,6 +232,59 @@ func Test_Q4_Calculator_AddInvalid_WithCustomDelimiter(t *testing.T) {
 
 	for _, value := range testCases {
 		t.Run(fmt.Sprintf("Test_Q4_Calculator_AddInvalid_WithCustomDelimiter %q", value), func(t *testing.T) {
+			_, err := sut.Add(value)
+			if err != missingNumberError {
+				t.Fatalf("expected %v but got %v", missingNumberError, err)
+			}
+		})
+	}
+}
+
+func Test_Q5_AddNegative(t *testing.T) {
+	testCases := []struct {
+		input          string
+		negativeInputs []int
+	}{
+		{input: "-1", negativeInputs: []int{-1}},
+		{input: "-1, 2", negativeInputs: []int{-1}},
+		{input: "-1, 2, -3", negativeInputs: []int{-1, -3}},
+		{input: "-1\n-2\n-3", negativeInputs: []int{-1, -2, -3}},
+		{input: "//;\n-1;-2;-4", negativeInputs: []int{-1, -2, -4}},
+		{input: "//;\n-1;-2;-3; 4; 5; -6", negativeInputs: []int{-1, -2, -3, -6}},
+	}
+
+	sut := NewCalculator(',', '\n')
+
+	for _, testCase := range testCases {
+		t.Run(fmt.Sprintf("Test_Q5_AddNegative %q", testCase.input), func(t *testing.T) {
+			_, err := sut.Add(testCase.input)
+			if err == nil {
+				t.Fatal("Expected an error but didn't get one")
+			}
+
+			actual, ok := err.(NegativeNumberError)
+			if !ok {
+				t.Fatalf("Expected NegativeNumberError but got %q", actual)
+			}
+
+			if !reflect.DeepEqual(testCase.negativeInputs, actual.Numbers) {
+				t.Fatalf("Expected %v but got %q", testCase.negativeInputs, actual.Numbers)
+			}
+		})
+	}
+}
+
+func Test_Q5_Calculator_AddNegativeInvalid(t *testing.T) {
+	testCases := []string{
+		"-1,",
+		",-1",
+		",-1,",
+	}
+
+	sut := NewCalculator()
+
+	for _, value := range testCases {
+		t.Run(fmt.Sprintf("Test_Q5_Calculator_AddNegativeInvalid %q", value), func(t *testing.T) {
 			_, err := sut.Add(value)
 			if err != missingNumberError {
 				t.Fatalf("expected %v but got %v", missingNumberError, err)

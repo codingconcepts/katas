@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -10,8 +11,8 @@ import (
 var (
 	missingNumberError = errors.New("Missing start or end number")
 
-	digitRegex    = regexp.MustCompile(`^\d$`)
-	surroundRegex = regexp.MustCompile(`^\d[\s\S]*\d$`)
+	digitRegex    = regexp.MustCompile(`^-?\d$`)
+	surroundRegex = regexp.MustCompile(`^-?\d[\s\S]*-?\d$`)
 
 	// TODO: this regex doesn't allow new line characters to
 	// be used as delimiters at the moment
@@ -26,10 +27,33 @@ type Calculator struct {
 	delimiters []rune
 }
 
+// NegativeNumberError is encountered when a negative
+// number is passed to the Calculator's Add method.
+type NegativeNumberError struct {
+	Numbers []int
+}
+
+// NewCalculator spins up a pointer to a new Calculator.
 func NewCalculator(delimiters ...rune) (calc *Calculator) {
 	return &Calculator{
 		delimiters: delimiters,
 	}
+}
+
+// NewNegativeNumberError creates the error with a
+// collection containing the negative numbers that
+// caused the error.
+func NewNegativeNumberError(numbers []int) error {
+	neg := NegativeNumberError{}
+
+	neg.Numbers = make([]int, len(numbers))
+	copy(neg.Numbers, numbers)
+
+	return neg
+}
+
+func (e NegativeNumberError) Error() string {
+	return fmt.Sprintf("negatives not allowed: %v", e.Numbers)
 }
 
 // Add takes a string of comma-separated numbers and
@@ -52,6 +76,7 @@ func (calc *Calculator) Add(numbers string) (result int, err error) {
 		return 0, nil
 	}
 
+	// validate the input string provided by the user,
 	// don't accept incomplete input e.g. "1,"
 	if err = validateInput(numbers); err != nil {
 		return
@@ -60,6 +85,12 @@ func (calc *Calculator) Add(numbers string) (result int, err error) {
 	// split and parse numbers to make them easy to sum
 	numberInts, err := calc.getNumbers(numbers)
 	if err != nil {
+		return
+	}
+
+	// validate the individual numbers provided by the user,
+	// don't accept negative input
+	if err = calc.validateNumbers(numberInts); err != nil {
 		return
 	}
 
@@ -78,6 +109,23 @@ func validateInput(numbers string) (err error) {
 	// only digits at the start and end of the input are allowed
 	if !digitRegex.MatchString(numbers) && !surroundRegex.MatchString(numbers) {
 		return missingNumberError
+	}
+
+	return
+}
+
+// validateNumbers validates each of the user's
+// provided numbers
+func (calc *Calculator) validateNumbers(numbers []int) (err error) {
+	neg := []int{}
+	for _, number := range numbers {
+		if number < 0 {
+			neg = append(neg, number)
+		}
+	}
+
+	if len(neg) > 0 {
+		return NewNegativeNumberError(neg)
 	}
 
 	return
