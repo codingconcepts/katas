@@ -39,7 +39,7 @@ func Test_DeterityVest(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(fmt.Sprintf("Test_DeterityVest_%v", testCase.act), func(t *testing.T) {
 			items := []Item{testCase.act}
-			GuildedRose(items)
+			UpdateQuality(items)
 
 			first := items[0]
 
@@ -104,7 +104,7 @@ func Test_AgedBrie(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(fmt.Sprintf("Test_AgedBrie_%v", testCase.act), func(t *testing.T) {
 			items := []Item{testCase.act}
-			GuildedRose(items)
+			UpdateQuality(items)
 
 			first := items[0]
 
@@ -153,7 +153,7 @@ func Test_Elixir(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(fmt.Sprintf("Test_Elixir_%v", testCase.act), func(t *testing.T) {
 			items := []Item{testCase.act}
-			GuildedRose(items)
+			UpdateQuality(items)
 
 			first := items[0]
 
@@ -198,7 +198,7 @@ func Test_Sulfuras(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(fmt.Sprintf("Test_Sulfuras_%v", testCase.act), func(t *testing.T) {
 			items := []Item{testCase.act}
-			GuildedRose(items)
+			UpdateQuality(items)
 
 			first := items[0]
 
@@ -307,7 +307,7 @@ func Test_BackstagePass(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(fmt.Sprintf("Test_BackstagePass_%v", testCase.act), func(t *testing.T) {
 			items := []Item{testCase.act}
-			GuildedRose(items)
+			UpdateQuality(items)
 
 			first := items[0]
 
@@ -357,7 +357,7 @@ func Test_Conjured(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(fmt.Sprintf("Test_Conjured_%v", testCase.act), func(t *testing.T) {
 			items := []Item{testCase.act}
-			GuildedRose(items)
+			UpdateQuality(items)
 
 			first := items[0]
 

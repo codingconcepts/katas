@@ -2,11 +2,6 @@ package main
 
 import "fmt"
 
-type Item struct {
-	name            string
-	sellIn, quality int
-}
-
 var globalItems = []Item{
 	Item{"+5 Dexterity Vest", 10, 20},
 	Item{"Aged Brie", 2, 0},
@@ -21,14 +16,14 @@ func main() {
 		fmt.Println("BEFORE", item)
 	}
 
-	GuildedRose(globalItems)
+	UpdateQuality(globalItems)
 
 	for _, item := range globalItems {
 		fmt.Println("AFTER ", item)
 	}
 }
 
-func GuildedRose(items []Item) {
+func UpdateQuality(items []Item) {
 	for i := 0; i < len(items); i++ {
 		if items[i].name != "Aged Brie" && items[i].name != "Backstage passes to a TAFKAL80ETC concert" {
 			if items[i].quality > 0 {
