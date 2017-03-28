@@ -1,8 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"os"
+)
 
-var globalItems = []Item{
+var items = []Item{
 	Item{"+5 Dexterity Vest", 10, 20},
 	Item{"Aged Brie", 2, 0},
 	Item{"Elixir of the Mongoose", 5, 7},
@@ -11,64 +15,34 @@ var globalItems = []Item{
 	Item{"Conjured Mana Cake", 3, 6},
 }
 
+var (
+	mappings ItemMappings
+)
+
 func main() {
-	for _, item := range globalItems {
-		fmt.Println("BEFORE", item)
+	// load mappings from file (or database etc.)
+	file, err := os.Open("items.json")
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	UpdateQuality(globalItems)
+	if mappings, err = LoadMappings(file); err != nil {
+		log.Fatal(err)
+	}
 
-	for _, item := range globalItems {
-		fmt.Println("AFTER ", item)
+	UpdateQuality(items)
+
+	for _, item := range items {
+		fmt.Println(item)
 	}
 }
 
+// UpdateQuality loops through a given collection of items
+// and modifies their quality/sell in according to their
+// type.
 func UpdateQuality(items []Item) {
 	for i := 0; i < len(items); i++ {
-		if items[i].name != "Aged Brie" && items[i].name != "Backstage passes to a TAFKAL80ETC concert" {
-			if items[i].quality > 0 {
-				if items[i].name != "Sulfuras, Hand of Ragnaros" {
-					items[i].quality = items[i].quality - 1
-				}
-			}
-		} else {
-			if items[i].quality < 50 {
-				items[i].quality = items[i].quality + 1
-				if items[i].name == "Backstage passes to a TAFKAL80ETC concert" {
-					if items[i].sellIn < 11 {
-						if items[i].quality < 50 {
-							items[i].quality = items[i].quality + 1
-						}
-					}
-					if items[i].sellIn < 6 {
-						if items[i].quality < 50 {
-							items[i].quality = items[i].quality + 1
-						}
-					}
-				}
-			}
-		}
-
-		if items[i].name != "Sulfuras, Hand of Ragnaros" {
-			items[i].sellIn = items[i].sellIn - 1
-		}
-
-		if items[i].sellIn < 0 {
-			if items[i].name != "Aged Brie" {
-				if items[i].name != "Backstage passes to a TAFKAL80ETC concert" {
-					if items[i].quality > 0 {
-						if items[i].name != "Sulfuras, Hand of Ragnaros" {
-							items[i].quality = items[i].quality - 1
-						}
-					}
-				} else {
-					items[i].quality = items[i].quality - items[i].quality
-				}
-			} else {
-				if items[i].quality < 50 {
-					items[i].quality = items[i].quality + 1
-				}
-			}
-		}
+		updater := mappings.CategoriseItem(&items[i])
+		updater.UpdateQuality()
 	}
 }

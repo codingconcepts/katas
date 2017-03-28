@@ -2,8 +2,32 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"strings"
 	"testing"
 )
+
+const (
+	testMappings = `
+	{
+		"+5 Dexterity Vest": "Standard",
+		"Aged Brie": "Aged",
+		"Elixir of the Mongoose": "Standard",
+		"Sulfuras, Hand of Ragnaros": "Legendary",
+		"Backstage passes to a TAFKAL80ETC concert": "Backstage Pass",
+		"Conjured Mana Cake": "Standard"
+	}`
+)
+
+func TestMain(m *testing.M) {
+	var err error
+	if mappings, err = LoadMappings(strings.NewReader(testMappings)); err != nil {
+		log.Fatal(err)
+	}
+
+	os.Exit(m.Run())
+}
 
 func Test_DeterityVest(t *testing.T) {
 	testCases := []struct {

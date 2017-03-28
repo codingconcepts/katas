@@ -1,0 +1,8 @@
+require 'rake'
+
+OUTPUT = 'rose.exe'
+
+task :run do
+    sh('go', 'build', '-o', OUTPUT)
+    sh(".\\#{OUTPUT}")
+end
