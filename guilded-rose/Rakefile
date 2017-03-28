@@ -2,6 +2,7 @@ require 'rake'
 
 OUTPUT = 'rose.exe'
 
+# performs a "go build", then runs the resulting executable
 task :run do
     sh('go', 'build', '-o', OUTPUT)
     sh(".\\#{OUTPUT}")

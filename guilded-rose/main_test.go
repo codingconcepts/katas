@@ -16,7 +16,7 @@ const (
 		"Elixir of the Mongoose": "Standard",
 		"Sulfuras, Hand of Ragnaros": "Legendary",
 		"Backstage passes to a TAFKAL80ETC concert": "Backstage Pass",
-		"Conjured Mana Cake": "Standard"
+		"Conjured Mana Cake": "Conjured"
 	}`
 )
 
@@ -346,7 +346,6 @@ func Test_BackstagePass(t *testing.T) {
 	}
 }
 
-// TODO: update to reflect change in system post refactor
 func Test_Conjured(t *testing.T) {
 	testCases := []struct {
 		act Item
@@ -354,19 +353,19 @@ func Test_Conjured(t *testing.T) {
 	}{
 		{
 			act: Item{name: "Conjured Mana Cake", sellIn: 10, quality: 20},
-			exp: Item{name: "Conjured Mana Cake", sellIn: 9, quality: 19},
+			exp: Item{name: "Conjured Mana Cake", sellIn: 9, quality: 18},
 		},
 		{
 			act: Item{name: "Conjured Mana Cake", sellIn: 9, quality: 20},
-			exp: Item{name: "Conjured Mana Cake", sellIn: 8, quality: 19},
+			exp: Item{name: "Conjured Mana Cake", sellIn: 8, quality: 18},
 		},
 		{
 			act: Item{name: "Conjured Mana Cake", sellIn: 1, quality: 20},
-			exp: Item{name: "Conjured Mana Cake", sellIn: 0, quality: 19},
+			exp: Item{name: "Conjured Mana Cake", sellIn: 0, quality: 18},
 		},
 		{
 			act: Item{name: "Conjured Mana Cake", sellIn: 0, quality: 20},
-			exp: Item{name: "Conjured Mana Cake", sellIn: -1, quality: 18},
+			exp: Item{name: "Conjured Mana Cake", sellIn: -1, quality: 16},
 		},
 		{
 			act: Item{name: "Conjured Mana Cake", sellIn: 0, quality: 1},

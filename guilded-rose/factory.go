@@ -43,6 +43,8 @@ func (mappings ItemMappings) CategoriseItem(item *Item) (updater Updater) {
 		return &Legendary{Item: item}
 	case "backstage pass":
 		return &BackstagePass{Item: item}
+	case "conjured":
+		return &Conjured{Item: item}
 	default:
 		return &Standard{Item: item}
 	}

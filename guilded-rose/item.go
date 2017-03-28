@@ -20,24 +20,23 @@ type BackstagePass struct {
 
 // UpdateQuality updates the quality of a BackstagePass.
 func (item *BackstagePass) UpdateQuality() {
-	if item.quality < 50 {
+	item.quality++
+
+	if item.sellIn < 11 {
 		item.quality++
-		if item.sellIn < 11 {
-			if item.quality < 50 {
-				item.quality++
-			}
-		}
-		if item.sellIn < 6 {
-			if item.quality < 50 {
-				item.quality++
-			}
-		}
+	}
+	if item.sellIn < 6 {
+		item.quality++
 	}
 
 	item.sellIn = item.sellIn - 1
 
 	if item.sellIn < 0 {
 		item.quality = 0
+	}
+
+	if item.quality > 50 {
+		item.quality = 50
 	}
 }
 
@@ -48,18 +47,15 @@ type Aged struct {
 
 // UpdateQuality updates the quality of an Aged item.
 func (item *Aged) UpdateQuality() {
-	if item.quality < 50 {
-		item.quality++
-	}
-
+	item.quality++
 	item.sellIn--
 
-	if item.sellIn >= 0 {
-		return
+	if item.sellIn < 0 {
+		item.quality++
 	}
 
-	if item.quality < 50 {
-		item.quality++
+	if item.quality > 50 {
+		item.quality = 50
 	}
 }
 
@@ -71,16 +67,15 @@ type Standard struct {
 
 // UpdateQuality updates the quality of a Standard item.
 func (item *Standard) UpdateQuality() {
-	if item.quality > 0 {
-		item.quality--
-	}
-
+	item.quality--
 	item.sellIn--
 
 	if item.sellIn < 0 {
-		if item.quality > 0 {
-			item.quality--
-		}
+		item.quality--
+	}
+
+	if item.quality < 0 {
+		item.quality = 0
 	}
 }
 
@@ -91,7 +86,17 @@ type Conjured struct {
 
 // UpdateQuality updates the quality of a Conjured item.
 func (item *Conjured) UpdateQuality() {
+	item.quality -= 2
 
+	item.sellIn--
+
+	if item.sellIn < 0 {
+		item.quality -= 2
+	}
+
+	if item.quality < 0 {
+		item.quality = 0
+	}
 }
 
 // Legendary is an item whose quality is not affected
