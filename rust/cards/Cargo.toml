@@ -1,0 +1,10 @@
+[package]
+name = "rust"
+version = "0.1.0"
+authors = ["robreid <robert.reid@lush.co.uk>"]
+
+[dependencies]
+chan = "*"
+lazy_static = "1.1.0"
+rand = "*"
+num_cpus = "*"
