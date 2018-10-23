@@ -9,42 +9,30 @@ use std::time::{Instant};
 use rand::Rng;
 
 lazy_static! {
-    static ref SUITS: Vec<Suit> = vec![Suit::Clubs, Suit::Diamonds, Suit::Hearts, Suit::Spades];
-    static ref NUMBERS: Vec<Number> = vec![Number::Ace, Number::Two, Number::Three, Number::Four, Number::Five, Number::Six, Number::Seven, Number::Eight, Number::Nine, Number::Ten, Number::Jack, Number::Queen, Number::King];
+    static ref SUITS: Vec<Suit> = vec![
+        Suit::Clubs,
+        Suit::Diamonds,
+        Suit::Hearts,
+        Suit::Spades
+    ];
+    
+    static ref NUMBERS: Vec<Number> = vec![
+        Number::Ace,
+        Number::Two,
+        Number::Three,
+        Number::Four,
+        Number::Five,
+        Number::Six,
+        Number::Seven,
+        Number::Eight,
+        Number::Nine,
+        Number::Ten,
+        Number::Jack,
+        Number::Queen,
+        Number::King
+    ];
 
     static ref MASTER_DECK: Deck = Deck::master();
-}
-
-fn main() {
-    let now = Instant::now();
-
-    perf_test(num_cpus::get(), 100000000, 25);
-
-    println!("Took {:#?}", now.elapsed());
-}
-
-fn perf_test(workers: usize, iterations: usize, cards_to_deal: usize) {
-	let wg = chan::WaitGroup::new();
-    for _ in 0..workers {
-        wg.add(1);
-        let wg = wg.clone();
-        thread::spawn(move || {
-            dealer(iterations / workers, cards_to_deal);
-            wg.done();
-        });
-    }
-    wg.wait();
-}
-
-fn dealer(iterations: usize, cards_to_deal: usize) {
-    let mut xor = FastXOR::new();
-
-    for _ in 0..iterations {
-        let mut d = Deck::new();
-        for _ in 0..cards_to_deal {
-            d.deal(&mut xor);
-        }
-    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
@@ -84,6 +72,38 @@ struct Deck {
     deal_index: usize,
 }
 
+fn main() {
+    let now = Instant::now();
+
+    perf_test(num_cpus::get(), 100000000, 25);
+
+    println!("Took {:#?}", now.elapsed());
+}
+
+fn perf_test(workers: usize, iterations: usize, cards_to_deal: usize) {
+	let wg = chan::WaitGroup::new();
+    for _ in 0..workers {
+        wg.add(1);
+        let wg = wg.clone();
+        thread::spawn(move || {
+            dealer(iterations / workers, cards_to_deal);
+            wg.done();
+        });
+    }
+    wg.wait();
+}
+
+fn dealer(iterations: usize, cards_to_deal: usize) {
+    let mut xor = XorShift::new();
+
+    for _ in 0..iterations {
+        let mut d = Deck::new();
+        for _ in 0..cards_to_deal {
+            d.deal(&mut xor);
+        }
+    }
+}
+
 impl Deck {
     fn master() -> Deck {
         let mut d = Deck{cards: Vec::new(), deal_index: 0};
@@ -101,7 +121,7 @@ impl Deck {
         d
     }
 
-    fn deal(&mut self, xor: &mut FastXOR) -> Card {
+    fn deal(&mut self, xor: &mut XorShift) -> Card {
         let next = xor.between(self.deal_index, 52);
         let card = self.cards[next];
 
@@ -112,18 +132,18 @@ impl Deck {
     }
 }
 
-struct FastXOR {
+struct XorShift {
 	x: usize,
 	y: usize,
 	z: usize,
 	w: usize,
 }
 
-impl FastXOR {
-	fn new() -> FastXOR {
+impl XorShift {
+	fn new() -> XorShift {
         let mut rng = rand::thread_rng();
 
-        FastXOR {
+        XorShift {
             x: rng.gen::<usize>(),
             y: rng.gen::<usize>(),
             z: rng.gen::<usize>(),

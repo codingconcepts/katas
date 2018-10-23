@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 #[test]
 fn test_fastxor_between() {
-	let mut xor = FastXOR::new();
+	let mut xor = XorShift::new();
 	
 	for _ in 0..1000 {
 		let b = xor.between(1, 10);
@@ -42,7 +42,7 @@ fn test_deck_new() {
 #[test]
 fn test_deck_deal() {
 	let mut d = Deck::new();
-	let mut xor = FastXOR::new();
+	let mut xor = XorShift::new();
 
 	let mut suits: HashMap<Suit, usize> = HashMap::new();
 	let mut numbers: HashMap<Number, usize> = HashMap::new();
@@ -57,9 +57,13 @@ fn test_deck_deal() {
 		*n += 1;
 	}
 
+	assert_eq!(52, d.deal_index);
+
+	// Assert there are 13 of each suit (1 for each number).
 	assert_eq!(4, suits.len());
 	assert!(suits.iter().all(|(_, v)| *v == 13));
 
+	// Assert there are 4 of each number (1 for each suit).
 	assert_eq!(13, numbers.len());
 	assert!(numbers.iter().all(|(_, v)| *v == 4));
 }
